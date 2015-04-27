@@ -9,16 +9,16 @@ struct state
 	int available[100];
 }intitial,temp;
 
-void saveState()
+void saveState(int r, int p)
 {
-	for(int i=0;i<100;i++)
+	for(int i=0;i<r;i++)
 	{	
 		temp.resource[i]=intitial.resource[i];
 		temp.available[i]=intitial.available[i];
 	}	
-	for(int i=0;i<100;i++)
+	for(int i=0;i<p;i++)
 	{
-		for(int j=0;j<100;j++)
+		for(int j=0;j<r;j++)
 		{
 			temp.alloc[i][j]=intitial.alloc[i][j];
 			temp.claim[i][j]=intitial.claim[i][j];
@@ -49,7 +49,7 @@ int main(){
 	cin>>Time;
 	
 	while(t<Time){
-		saveState();
+		saveState(r,p);
 		//generateRequest();
 		if(!isSafe()){
 		//	restoreState();
