@@ -92,6 +92,25 @@ bool isSafe(int r,int p)
 	return false;
 }
 
+void restoreState(int r,int p)
+{
+
+	for(int i=0;i<r;i++)
+	{	
+		real.resource[i]=temp.resource[i];
+		real.available[i]=temp.available[i];
+	}	
+	for(int i=0;i<p;i++)
+	{
+		for(int j=0;j<r;j++)
+		{
+			real.alloc[i][j]=temp.alloc[i][j];
+			real.claim[i][j]=temp.claim[i][j];
+
+		}
+	}
+
+}
 int main(){
 	
 	int t=0, p, r, Time;
@@ -115,7 +134,7 @@ int main(){
 		saveState(r,p);
 		performRequest(r, p);
 		if(!isSafe(r,p)){
-		//	restoreState();
+			restoreState(r,p);
 		}
 		t++;
 	}
