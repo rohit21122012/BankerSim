@@ -226,6 +226,7 @@ int main(){
 		saveState(r,p);
 		pid  = performRequest(r, p);
 		if(!isSafe(r,p)){
+			allProcesses[pid].state = SUSPENDED;
 			restoreState(r,p);
 		}else{
 			if(satisfied(pid,r)){
