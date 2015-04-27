@@ -29,7 +29,7 @@ bool requestExceedsAvailable(int request, int available, int r){
  	return false;
 }
 
-void performRequest(int p, int r){
+void performRequest(int r, int p){
 	/*generation of the request*/
 	//choose one od the processes
 	int	randomP = rand()%p;
@@ -43,7 +43,7 @@ void performRequest(int p, int r){
 
 
 
-	if(requestExceedsAvailable(request, real.available)){
+	if(requestExceedsAvailable(request, real.available, r)){
 		allProcesses[randomP].state = SUSPENDED;
 	}else{
 		for (int j = 0; j < r; ++j)
@@ -113,7 +113,7 @@ int main(){
 	
 	while(t<Time){
 		saveState(r,p);
-		//generateRequest();
+		performRequest(r, p);
 		if(!isSafe(r,p)){
 		//	restoreState();
 		}
