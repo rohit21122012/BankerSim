@@ -11,8 +11,20 @@ struct state
 
 void saveState()
 {
+	for(int i=0;i<100;i++)
+	{	
+		temp.resource[i]=intitial.resource[i];
+		temp.available[i]=intitial.available[i];
+	}	
+	for(int i=0;i<100;i++)
+	{
+		for(int j=0;j<100;j++)
+		{
+			temp.alloc[i][j]=intitial.alloc[i][j];
+			temp.claim[i][j]=intitial.claim[i][j];
 
-
+		}
+	}
 }
 
 bool isSafe()
