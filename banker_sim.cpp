@@ -7,30 +7,45 @@ struct state
 	int claim[100][100];
 	int alloc[100][100];
 	int available[100];
-}intitial,temp;
+}real,temp;
 
 void saveState(int r, int p)
 {
 	for(int i=0;i<r;i++)
 	{	
-		temp.resource[i]=intitial.resource[i];
-		temp.available[i]=intitial.available[i];
+		temp.resource[i]=real.resource[i];
+		temp.available[i]=real.available[i];
 	}	
 	for(int i=0;i<p;i++)
 	{
 		for(int j=0;j<r;j++)
 		{
-			temp.alloc[i][j]=intitial.alloc[i][j];
-			temp.claim[i][j]=intitial.claim[i][j];
+			temp.alloc[i][j]=real.alloc[i][j];
+			temp.claim[i][j]=real.claim[i][j];
 
 		}
 	}
 }
 
-bool isSafe()
+bool isSafe(int r,int p)
 {
+	bool check = false;
+	for(int i=0;i<p;i++)
+	{
+			for(int j=0;j<r;j++)
+			{
+				if(real.claim[i][j]-real.alloc[i][j]<=real.available[j])
+					check=true;
+				else{
+					check=false;
+					break;
+				}
+			}
+			if(check)
+				return check;
+	}
 
-	return true;
+	return false;
 }
 
 int main(){
@@ -44,14 +59,14 @@ int main(){
 
 	cout<<"Enter the resource(R) vector\n";
 	for(int i=0;i<r;i++)
-		cin >> intitial.resource[i];
+		cin >> real.resource[i];
 	cout<<"Enter the amount of time to simulate\n";
 	cin>>Time;
 	
 	while(t<Time){
 		saveState(r,p);
 		//generateRequest();
-		if(!isSafe()){
+		if(!isSafe(r,p)){
 		//	restoreState();
 		}
 		t++;
