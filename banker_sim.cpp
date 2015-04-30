@@ -1,5 +1,6 @@
 #include <iostream>
 #include <cstdlib>
+#include <ctime>
 using namespace std;
 
 #define SUSPENDED	0
@@ -12,20 +13,22 @@ struct state
 	int claim[100][100];
 	int alloc[100][100];
 	int available[100];
-}real,temp;
+}real,temp, temp2;
 
 
 
 struct Processes{
 	int state;
-	int time;
+//	int time;
 } allProcesses[100];
 
 
 
 bool exceedsAvailable(int request[], int available[], int r){
+
  	for (int j = 0; j < r; ++j)
  	{
+ 	//	cout<<request[j]<<" "<<available[j]<<endl;
  		if(request[j] > available[j])
  			return true;
  	}
@@ -43,7 +46,7 @@ int performRequest(int r, int p){
 	for (int j = 0; j < r; ++j)
 	{
 		if(real.claim[randomP][j] - real.alloc[randomP][j] != 0)
-			request[j] = rand()%(real.claim[randomP][j] - real.alloc[randomP][j]);
+			request[j] = rand()%(real.claim[randomP][j] - real.alloc[randomP][j])+ 1;
 		else
 			request[j] = 0;
 		cout<<request[j]<<", ";
@@ -55,6 +58,7 @@ int performRequest(int r, int p){
 
 	if(exceedsAvailable(request, real.available, r)){
 		allProcesses[randomP].state = SUSPENDED;
+		cout<<"SUSPENDED1"<<endl;
 	}else{
 		for (int j = 0; j < r; ++j)
 		{
@@ -84,33 +88,11 @@ void saveState(int r, int p)
 	}
 }
 
-// bool isSafe(int r,int p)
-// {
-// 	bool check = false;
-// 	for(int i=0;i<p;i++)
-// 	{
-// 			for(int j=0;j<r;j++)
-// 			{
-// 				if(real.claim[i][j]-real.alloc[i][j]<=real.available[j])
-// 					check=true;
-// 				else{
-// 					check=false;
-// 					break;
-// 				}
-// 			}
-// 			if(check)
-// 				return check;
-// 	}
-
-// 	return false;
-// }
-
-
-//returns if current real state can go to completion without deadlock
 bool isSafe(int r, int p){
 //	cout<<"Checking if current state is safe"<<endl;
 	int count = p;
 	bool picked[p];
+
 	for (int i = 0; i < p; ++i)
 	{
 		picked[i] = false;
@@ -147,6 +129,23 @@ bool isSafe(int r, int p){
 }
 
 
+void saveState2(int r, int p){
+	//cout<<"saving state"<<endl;
+	for(int i=0;i<r;i++)
+	{	
+		temp2.resource[i]=real.resource[i];
+		temp2.available[i]=real.available[i];
+	}	
+	for(int i=0;i<p;i++)
+	{
+		for(int j=0;j<r;j++)
+		{
+			temp2.alloc[i][j]=real.alloc[i][j];
+			temp2.claim[i][j]=real.claim[i][j];
+
+		}
+	}
+}
 
 void restoreState(int r,int p)
 {
@@ -168,6 +167,26 @@ void restoreState(int r,int p)
 
 }
 
+
+void restoreState2(int r,int p)
+{
+
+	for(int i=0;i<r;i++)
+	{	
+		real.resource[i]=temp2.resource[i];
+		real.available[i]=temp2.available[i];
+	}	
+	for(int i=0;i<p;i++)
+	{
+		for(int j=0;j<r;j++)
+		{
+			real.alloc[i][j]=temp2.alloc[i][j];
+			real.claim[i][j]=temp2.claim[i][j];
+
+		}
+	}
+
+}
 
 void initialState(int r, int p){
 	for (int i = 0; i < p; ++i)
@@ -211,7 +230,7 @@ bool satisfied(int pid, int r){
 }
 
 int main(){
-	
+	srand(time(NULL));
 	int t=0, p, r, Time;
 	cout<<"Enter the amount of time to simulate\n";
 	cin>>Time;
@@ -222,29 +241,39 @@ int main(){
 	
 	initialState(r,p);
 	int pid;
+	int StateData[p][Time];
 	while(t<Time){
+		
 		saveState(r,p);
 		pid  = performRequest(r, p);
+		saveState2(r,p);
 		if(!isSafe(r,p)){
 			allProcesses[pid].state = SUSPENDED;
+			cout<<"SUSPENDED2"<<endl;
 			restoreState(r,p);
 		}else{
+			restoreState2(r,p);
 			if(satisfied(pid,r)){
 				for (int j = 0; j < r; ++j)
 				{
 					real.available[j] += real.claim[pid][j];
 				}
 				allProcesses[pid].state = TERMINATED;
+				cout<<"TERMINATED"<<endl;
 			}
+			cout<<"ALLOWED"<<endl;
 		}
 		t++;
-
+		for (int i = 0; i < p; ++i)
+		{
+			StateData[i][t] = allProcesses[i].state; 			
+		}
 	}
 	for (int i = 0; i < p; ++i)
 	{
-		for (int j = 0; j < Time; ++j)
+		for (int j = 1; j < Time; ++j)
 		{
-			cout<<allProcesses[i].state;
+			cout<<StateData[i][j];
 		}	
 		cout<<endl;			
 	}
